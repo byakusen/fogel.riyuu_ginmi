@@ -223,6 +223,36 @@ h1 .b{color:var(--blue)}h1 .o{color:var(--orange)}h1 .g{color:var(--green)}
 .gbetter .ctag{--c:var(--green)}
 .opts.long{grid-template-columns:1fr;gap:8px}
 .opts.long .opt{font-size:clamp(1rem,1.6vw,1.2rem);text-align:left;padding:9px 16px;line-height:1.5}
+/* ⑤ 言葉の練習 */
+.tab:nth-child(5){background:#e0f4f1;color:#1f7a6e;border-color:#b5e3db}
+.tab:nth-child(5) small{color:#1f7a6e}
+.tab:nth-child(5)[aria-selected="true"]{background:#2a9d8f;color:#fff}
+.tab:nth-child(5)[aria-selected="true"] small{color:#fff}
+.tab:nth-child(5)[aria-selected="true"]::after{background:rgba(255,255,255,.85)}
+.kr{flex:1;min-height:0;display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+.kr .box{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto}
+.ktext{background:#fff;border-radius:16px;padding:14px 18px;font-size:clamp(1.2rem,2.1vw,1.55rem);font-weight:700;line-height:2.2}
+.ktext .kp{border-radius:8px;transition:background .3s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.ktext.done .kp.k{background:var(--blue-bg)}
+.ktext.done .kp.r{background:var(--orange-bg)}
+.ktext.done .kp.k .ctag{--c:var(--blue)}
+.ktext.done .kp.r .ctag{--c:var(--orange)}
+.kblank{display:inline-block;min-width:4.2em;text-align:center;border:3px solid var(--ink);border-radius:10px;padding:0 8px;margin:0 3px;line-height:1.45;background:#fff;color:var(--ink)}
+.kblank.ok{border-color:var(--green);color:var(--green);background:var(--green-bg);animation:fade .35s ease}
+.krow{display:flex;align-items:center;gap:10px}
+.knum{flex:none;font-size:1.6rem;font-weight:800;width:1.4em;text-align:center}
+.kopt{flex:1;border:0;border-radius:16px;padding:12px 10px;font-size:clamp(1.15rem,2vw,1.45rem);font-weight:800;background:#fff;
+  box-shadow:0 4px 12px rgba(40,60,80,.12);border-bottom:5px solid var(--orange);transition:transform .15s,background .2s,opacity .2s}
+.kopt:hover:not(:disabled){transform:translateY(-3px)}
+.kopt:disabled{cursor:default}
+.kopt.right{background:var(--green-bg);outline:3px solid var(--green);border-bottom-color:var(--green)}
+.kopt.wrong{background:#fde2e2;outline:2px solid var(--red);border-bottom-color:var(--red);opacity:.7}
+.kopt.dim{opacity:.4}
+.kr .btn.main{align-self:flex-end}
+@media (max-width:760px){
+  .kr{grid-template-columns:1fr;flex:none}
+  .kr .box{overflow:visible}
+}
 
 @media (max-width:760px){
   .gm,.wr{grid-template-columns:1fr;flex:none}
@@ -364,6 +394,7 @@ const TABS = [
   {view:'quiz',   tab:'② ぎんみクイズ',     sub:'auto'},
   {view:'ginmi',  tab:'③ 文章をぎんみ',     sub:'ア〜オ'},
   {view:'write',  tab:'④ 理由を書こう',     sub:'ぎんみチェック'},
+  {view:'renshu', tab:'⑤ 言葉の練習',       sub:'なぜなら〜から'},
   {view:'words',  tab:'重要語句',           sub:'ことばのいみ'}
 ];
 
@@ -652,6 +683,81 @@ VIEWS.write = function(){
   panel.querySelectorAll('.wcheck').forEach(b=>b.onclick=()=>{const i=+b.dataset.c;wChecks[i]=!wChecks[i];if(!wChecks[i])wDone=false;VIEWS.write();});
   done.onclick=()=>{wDone=true;VIEWS.write();pinpon();setTimeout(party,150);};
   $('#wReset').onclick=()=>{wTopic=0;wText='';wChecks=[];wDone=false;VIEWS.write();};
+};
+
+/* ---- ⑤ 言葉の練習（理由を伝える言い方） ----
+   parts の k:'k' が考え、k:'r' が理由。{1}{2} が①②のあな。
+   blanks[].o が2つの言葉、a が正しいほう（0から）、h はまちがえたときのヒント */
+const RENSHU = [
+  {parts:[{t:'学校の花だんに、花の名前を書いたふだを立てるほうがよいと思います。',k:'k'},
+          {t:'{1}、名前が分かると、花にもっときょうみをもつ人がふえる{2}です。',k:'r'}],
+   blanks:[{o:['なぜなら','どうして'],a:0,h:'「どうして」は、聞くときの言葉だよ。この後に理由が続くね。'},
+           {o:['から','とき'],a:0,h:'「なぜなら」と組になる言葉はどっちかな？'}],
+   why:'考えのあとに理由を書くときは、「<b>なぜなら</b>、〜<b>から</b>です。」の形にすると、理由だと分かりやすい。'},
+  {parts:[{t:'休み時間に、校庭で遊ぶ学年を、曜日で分けるほうがよいと思います。',k:'k'},
+          {t:'{1}、人が多すぎて、ぶつかりそうになることがある{2}です。',k:'r'}],
+   blanks:[{o:['どうして','なぜなら'],a:1,h:'「どうして」は、聞くときの言葉だよ。この後に理由が続くね。'},
+           {o:['とき','から'],a:1,h:'「なぜなら」と組になる言葉はどっちかな？'}],
+   why:'「<b>なぜなら</b>」で理由が始まることを知らせ、「<b>から</b>です」で理由をしめくくる。'},
+  {parts:[{t:'給食の時間に、音楽を流すほうがよいと思います。',k:'k'},
+          {t:'{1}、明るい曲を聞くと、楽しい気持ちで食べられる{2}です。',k:'r'}],
+   blanks:[{o:['ところで','なぜなら'],a:1,h:'「ところで」は、話を変えるときの言葉だよ。'},
+           {o:['から','まで'],a:0,h:'理由の終わりに使う言葉はどっちかな？'}],
+   why:'「ところで」は話を変える言葉。理由を言うときは「<b>なぜなら</b>、〜<b>から</b>です。」を使う。'},
+  {parts:[{t:'公園のベンチに、屋根をつけるほうがよいと思います。',k:'k'},
+          {t:'{1}、雨の日や日差しが強い日でも、ゆっくり休める{2}です。',k:'r'}],
+   blanks:[{o:['なぜなら','けれども'],a:0,h:'「けれども」は、前と反対のことを言うときの言葉だよ。'},
+           {o:['とき','から'],a:1,h:'「なぜなら」と組になる言葉はどっちかな？'}],
+   why:'「けれども」は反対のことを言う言葉。理由を言うときは「<b>なぜなら</b>、〜<b>から</b>です。」を使う。'},
+  {parts:[{t:'通学路の横断歩道に、信号をつけるほうがよいと思います。',k:'k'},
+          {t:'{1}、車の通りが多くて、わたるのがこわいという人がいる{2}です。',k:'r'}],
+   blanks:[{o:['たとえば','なぜなら'],a:1,h:'「たとえば」は、例をあげるときの言葉だよ。'},
+           {o:['から','とき'],a:0,h:'理由の終わりに使う言葉はどっちかな？'}],
+   why:'「たとえば」は例をあげる言葉。理由を言うときは「<b>なぜなら</b>、〜<b>から</b>です。」を使う。'},
+  {parts:[{t:'図書室の本をテーマごとにならべると、さがしている本がすぐに見つかります。',k:'r'},
+          {t:'{1}、本はテーマごとにならべるほうがよいと思います。',k:'k'}],
+   blanks:[{o:['なぜなら','だから'],a:1,h:'理由が先に書いてあるね。後ろは「考え」だよ。'}],
+   why:'理由を<b>先</b>に書いて、後から考えを書くときは「<b>だから</b>」でつなぐ。考えが先なら「なぜなら、〜から」。'}
+];
+const RS_NUM=['①','②','③'];
+let rsCur=0, rsSt=null;
+function rsInit(){ rsSt=RENSHU.map(r=>({ok:r.blanks.map(()=>false),wrong:r.blanks.map(()=>[]),msg:''})); }
+VIEWS.renshu = function(){
+  if(!rsSt) rsInit();
+  const R=RENSHU[rsCur], S=rsSt[rsCur], done=S.ok.every(Boolean);
+  const fill=t=>t.replace(/\{(\d)\}/g,(m,n)=>{const j=n-1, b=R.blanks[j];
+    return S.ok[j]?`<span class="kblank ok">${b.o[b.a]}</span>`:`<span class="kblank">${RS_NUM[j]}</span>`;});
+  panel.innerHTML=`
+    <div class="bar">
+      <div class="lead">次の文章は、自分の考えと、その理由を書いたものです。${R.blanks.map((_,j)=>RS_NUM[j]).join('・')}に合う言葉をえらぼう。</div>
+      <div class="seg">${RENSHU.map((r,i)=>`<button class="${i===rsCur?'on':''}" data-r="${i}">問題${i+1}${rsSt[i].ok.every(Boolean)?' ✓':''}</button>`).join('')}</div>
+      <button class="btn" id="rReset">もう一度</button>
+    </div>
+    <div class="kr">
+      <div class="box">
+        <div class="label">文章を読もう</div>
+        <div class="ktext ${done?'done':''}">${R.parts.map(p=>`<span class="kp ${p.k}">${done?`<span class="ctag">${p.k==='k'?'考え':'理由'}</span>`:''}${fill(p.t)}</span>`).join('')}</div>
+      </div>
+      <div class="box">
+        <div class="label">${R.blanks.map((_,j)=>RS_NUM[j]).join('・')}に合う言葉をおそう</div>
+        ${R.blanks.map((b,j)=>`<div class="krow"><span class="knum">${RS_NUM[j]}</span>${b.o.map((o,k)=>{
+          const cls=S.ok[j]&&k===b.a?'right':S.wrong[j].includes(k)?'wrong':S.ok[j]?'dim':'';
+          return `<button class="kopt ${cls}" data-j="${j}" data-k="${k}" ${S.ok[j]||S.wrong[j].includes(k)?'disabled':''}>${o}</button>`;}).join('')}</div>`).join('')}
+        <div class="gmsg">${done?'':S.msg}</div>
+        <div class="gwhy ${done?'show':''}">${done?R.why:'ぜんぶえらぶと、ここに説明が出るよ。'}</div>
+        ${done&&rsCur<RENSHU.length-1?'<button class="btn main" id="rNext">つぎの問題へ ›</button>':''}
+      </div>
+    </div>`;
+  panel.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{rsCur=+b.dataset.r;VIEWS.renshu();});
+  $('#rReset').onclick=()=>{rsInit();rsCur=0;VIEWS.renshu();};
+  panel.querySelectorAll('.kopt').forEach(b=>b.onclick=()=>{
+    const j=+b.dataset.j, k=+b.dataset.k, B=R.blanks[j];
+    if(k===B.a){S.ok[j]=true;S.msg='';pinpon();}else{S.wrong[j].push(k);S.msg=B.h;bubu();}
+    VIEWS.renshu();
+    if(S.ok.every(Boolean)&&rsSt.every(s=>s.ok.every(Boolean)))setTimeout(party,200);
+  });
+  const nx=$('#rNext');
+  if(nx) nx.onclick=()=>{rsCur++;VIEWS.renshu();};
 };
 
 /* ---- 重要語句 ---- */
